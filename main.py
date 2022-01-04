@@ -4,7 +4,7 @@ import random
 from sdl2 import *
 from grid import Grid, Collision
 from pieces import pieces
-from gameclock import GameClock
+from gameclock import GameClock, Clock
 from actionhandler import ActionHandler
 
 CELL_SIZE = 24
@@ -23,14 +23,18 @@ def run():
 
   grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
   grid.add_piece(random.choice(pieces), 4, 1)
-  game_clock = GameClock(TICKS_PER_SECOND)
+
+  clock = Clock()
+  game_clock = GameClock(clock, TICKS_PER_SECOND)
   game_clock.start()
-  action_handler = ActionHandler(grid, ACTIONS_PER_SECOND)
+  action_handler = ActionHandler(grid, clock, ACTIONS_PER_SECOND)
   action_handler.start()
 
   running = True
   event = SDL_Event()
   while running:
+    clock.update_time()
+
     while SDL_PollEvent(ctypes.byref(event)):
       if event.type == SDL_QUIT:
         running = False

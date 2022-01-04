@@ -3,9 +3,9 @@ from grid import Grid, Collision
 from gameclock import GameClock
 
 class ActionHandler:
-  def __init__(self, grid, actions_per_second):
+  def __init__(self, grid, clock, actions_per_second):
     self.grid = grid
-    self.clock = GameClock(actions_per_second)
+    self.clock = GameClock(clock, actions_per_second)
     self.move_left = False
     self.moved_left = True
     self.move_right = False
