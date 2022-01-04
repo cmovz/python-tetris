@@ -10,7 +10,7 @@ from actionhandler import ActionHandler
 CELL_SIZE = 24
 MAP_SIZE = 12, 22
 TICKS_PER_SECOND = 1
-ACTIONS_PER_SECOND = 8
+ACTIONS_PER_SECOND = 12
 
 def run():
   SDL_Init(SDL_INIT_VIDEO)
