@@ -61,7 +61,10 @@ def run():
           new_piece.reset_rotation()
           grid.add_piece(new_piece, 4, 1)
         except Collision:
+          print('-' * 40)
           print('Game over')
+          print('You scored:', score.score)
+          print('-' * 40)
           running = False
     
     grid.draw()
