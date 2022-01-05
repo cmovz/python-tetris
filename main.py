@@ -1,7 +1,9 @@
 import sys
+import os
 import ctypes
 import random
 from sdl2 import *
+from sdl2.sdlttf import *
 from grid import Grid, Collision
 from pieces import pieces
 from gameclock import GameClock, Clock
@@ -9,7 +11,7 @@ from actionhandler import ActionHandler
 
 CELL_SIZE = 24
 MAP_SIZE = 12, 22
-TICKS_PER_SECOND = 1
+FALLING_PER_SECOND = 1
 ACTIONS_PER_SECOND = 12
 MAX_FPS = 12
 DRAW_TIME = 1000000000 // MAX_FPS
@@ -23,15 +25,24 @@ def run():
   )
   window_surface = SDL_GetWindowSurface(window)
 
+  path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    'images',
+    'OpenSans-Regular.ttf'
+  )
+  TTF_Init()
+  font = TTF_OpenFont(path.encode(), 32)
+
   grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
   grid.add_piece(random.choice(pieces), 4, 1)
 
   clock = Clock()
-  game_clock = GameClock(clock, TICKS_PER_SECOND)
+  game_clock = GameClock(clock, FALLING_PER_SECOND)
   game_clock.start()
   action_handler = ActionHandler(grid, clock, ACTIONS_PER_SECOND)
   action_handler.start()
 
+  score = 0
   running = True
   event = SDL_Event()
   while running:
@@ -52,7 +63,7 @@ def run():
       except Collision:
         try:
           grid.move_piece(0, -1)
-          grid.integrate_piece()
+          score += grid.integrate_piece()
           new_piece = random.choice(pieces)
           new_piece.reset_rotation()
           grid.add_piece(new_piece, 4, 1)
@@ -61,6 +72,23 @@ def run():
           running = False
     
     grid.draw()
+
+    # draw score
+    text = str(score).encode()
+    w = ctypes.c_int()
+    h = ctypes.c_int()
+    TTF_SizeText(font, text, ctypes.byref(w), ctypes.byref(h))
+    dest_rect = SDL_Rect(
+      (MAP_SIZE[0] - 1) * CELL_SIZE - w.value - 8,
+      CELL_SIZE,
+      w.value,
+      h.value
+    )
+    color = SDL_Color(255, 255, 255)
+    text_surface = TTF_RenderText_Blended(font, text, color)
+    SDL_BlitSurface(text_surface, None, window_surface, ctypes.byref(dest_rect))
+    SDL_FreeSurface(text_surface)
+
     SDL_UpdateWindowSurface(window)
     
     clock.update_time()
