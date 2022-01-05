@@ -18,7 +18,8 @@ class GameClock:
   
   def get_ticks(self):
     '''
-    Return how many ticks have occurred since the last call and updates clock.
+    Returns how many ticks have occurred since the last call.
+    Updates tick_time.
     '''
     t = self.clock.time
     dt = t - self.previous_tick
