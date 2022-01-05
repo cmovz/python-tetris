@@ -11,6 +11,8 @@ CELL_SIZE = 24
 MAP_SIZE = 12, 22
 TICKS_PER_SECOND = 1
 ACTIONS_PER_SECOND = 12
+MAX_FPS = 12
+DRAW_TIME = 1000000000 // MAX_FPS
 
 def run():
   SDL_Init(SDL_INIT_VIDEO)
@@ -34,6 +36,7 @@ def run():
   event = SDL_Event()
   while running:
     clock.update_time()
+    t0 = clock.time
 
     while SDL_PollEvent(ctypes.byref(event)):
       if event.type == SDL_QUIT:
@@ -59,7 +62,12 @@ def run():
     
     grid.draw()
     SDL_UpdateWindowSurface(window)
-    SDL_Delay(1)
+    
+    clock.update_time()
+    t1 = clock.time
+    dt = t1 - t0
+    if dt < DRAW_TIME:
+      SDL_Delay((DRAW_TIME - dt) // 1000000)
     
   SDL_DestroyWindow(window)
   SDL_Quit()
