@@ -51,8 +51,10 @@ class Grid:
   def integrate_piece(self):
     '''
     Adds the piece's cells to the grid and remove the piece.
-    Clears the filled rows.
+    Clears the filled rows and returns how many rows were cleared.
     '''
+    cleared_rows = 0
+
     for y, row in enumerate(self.piece.matrix):
       for x, filled in enumerate(row):
         if not filled:
@@ -70,6 +72,7 @@ class Grid:
           if color == Color.BLACK:
             break
         else:
+          cleared_rows += 1
           first_row = [Color.GRAY for _ in range(self.w)]
           second_row = (
             [Color.GRAY] + [Color.BLACK for _ in range(self.w-2)] + [Color.GRAY]
@@ -80,6 +83,8 @@ class Grid:
 
     del self.piece
     del self.piece_pos
+
+    return cleared_rows
 
   def is_there_collision(self):
     for y, row in enumerate(self.piece.matrix):

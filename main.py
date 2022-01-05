@@ -2,20 +2,23 @@ import sys
 import ctypes
 import random
 from sdl2 import *
+from sdl2.sdlttf import TTF_Init, TTF_Quit
 from grid import Grid, Collision
 from pieces import pieces
 from gameclock import GameClock, Clock
 from actionhandler import ActionHandler
+from score import Score
 
 CELL_SIZE = 24
 MAP_SIZE = 12, 22
-TICKS_PER_SECOND = 1
+FALLING_PER_SECOND = 1
 ACTIONS_PER_SECOND = 12
 MAX_FPS = 12
 DRAW_TIME = 1000000000 // MAX_FPS
 
 def run():
   SDL_Init(SDL_INIT_VIDEO)
+  TTF_Init()
 
   window = SDL_CreateWindow(
     b'Tetris', SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 
@@ -27,10 +30,11 @@ def run():
   grid.add_piece(random.choice(pieces), 4, 1)
 
   clock = Clock()
-  game_clock = GameClock(clock, TICKS_PER_SECOND)
+  game_clock = GameClock(clock, FALLING_PER_SECOND)
   game_clock.start()
   action_handler = ActionHandler(grid, clock, ACTIONS_PER_SECOND)
   action_handler.start()
+  score = Score(window_surface, (MAP_SIZE[0] - 1) * CELL_SIZE - 8, CELL_SIZE)
 
   running = True
   event = SDL_Event()
@@ -52,7 +56,7 @@ def run():
       except Collision:
         try:
           grid.move_piece(0, -1)
-          grid.integrate_piece()
+          score.add(grid.integrate_piece())
           new_piece = random.choice(pieces)
           new_piece.reset_rotation()
           grid.add_piece(new_piece, 4, 1)
@@ -61,6 +65,8 @@ def run():
           running = False
     
     grid.draw()
+    score.draw()
+
     SDL_UpdateWindowSurface(window)
     
     clock.update_time()
@@ -70,6 +76,7 @@ def run():
       SDL_Delay((DRAW_TIME - dt) // 1000000)
     
   SDL_DestroyWindow(window)
+  TTF_Quit()
   SDL_Quit()
   return 0
 
