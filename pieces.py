@@ -21,6 +21,9 @@ class Piece:
   
   def rotate_backwards(self):
     self.pos = (self.pos + 3) % 4
+  
+  def reset_rotation(self):
+    self.pos = 0
 
 i = Piece(
   (

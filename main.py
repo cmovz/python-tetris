@@ -50,7 +50,9 @@ def run():
         try:
           grid.move_piece(0, -1)
           grid.integrate_piece()
-          grid.add_piece(random.choice(pieces), 4, 1)
+          new_piece = random.choice(pieces)
+          new_piece.reset_rotation()
+          grid.add_piece(new_piece, 4, 1)
         except Collision:
           print('Game over')
           running = False
