@@ -1,5 +1,5 @@
 from sdl2 import *
-from grid import Grid, Collision
+from grid import Collision
 from gameclock import GameClock
 
 class ActionHandler:
