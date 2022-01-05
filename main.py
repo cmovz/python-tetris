@@ -74,6 +74,9 @@ def run():
     dt = t1 - t0
     if dt < DRAW_TIME:
       SDL_Delay((DRAW_TIME - dt) // 1000000)
+  
+  # avoid calling TTF_CloseFont() after TTF_Quit(), which causes a SEGFAULT
+  del score
     
   SDL_DestroyWindow(window)
   TTF_Quit()
