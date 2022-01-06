@@ -2,7 +2,6 @@ import ctypes
 from sdl2 import SDL_BlitSurface, SDL_Rect
 from colors import Color
 from textures import textures
-from pieces import pieces
 
 class Collision(Exception):
   pass
