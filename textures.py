@@ -1,13 +1,10 @@
+import os
 from colors import Color
 from sdl2 import SDL_LoadBMP
-import os
+from utils import get_resource_path
 
 textures = {}
 
 for e in Color:
-  path = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    'images',
-    e.name.lower() + '.bmp',
-  )
+  path = get_resource_path('images', e.name.lower() + '.bmp')
   textures[e] = SDL_LoadBMP(path.encode())

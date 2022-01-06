@@ -1,15 +1,11 @@
-import os
 import ctypes
 from sdl2.sdlttf import *
 from sdl2 import SDL_BlitSurface, SDL_Color, SDL_FreeSurface, SDL_Rect
+from utils import get_resource_path
 
 class Score:
   def __init__(self, dest_surface, x=0, y=0):
-    path = os.path.join(
-      os.path.dirname(os.path.abspath(__file__)),
-      'images',
-      'OpenSans-Regular.ttf'
-    )
+    path = get_resource_path('images', 'OpenSans-Regular.ttf')
     self.font = TTF_OpenFont(path.encode(), 32)
     self.score = 0
     self.dest_surface = dest_surface
