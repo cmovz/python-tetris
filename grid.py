@@ -114,9 +114,7 @@ class Grid:
       self.draw_piece()
   
   def draw_piece(self):
-    dest_rect = SDL_Rect()
-    dest_rect.w = self.cell_size
-    dest_rect.h = self.cell_size
+    dest_rect = SDL_Rect(w=self.cell_size, h=self.cell_size)
 
     for y, row in enumerate(self.piece.matrix):
       for x, filled in enumerate(row):
