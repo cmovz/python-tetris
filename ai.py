@@ -46,14 +46,12 @@ class AI:
       
         filled_rows = self.grid.integrate_piece()
         height = self.grid.compute_height()
-        height_penalty = height * 100
-        holes = self.compute_holes_penalty(self.grid)
-        holes_penalty = holes * 10
+        height_penalty = height ** 2
         fitness = (
           filled_rows * 1000
           - height_penalty
-          - holes_penalty
-          - (self.grid.compute_horizontal_space())
+          - self.compute_holes_penalty(self.grid)
+          - self.grid.compute_horizontal_space()
         )
 
         possible_fit = PossibleFit(fitness, x, rot)
@@ -89,6 +87,9 @@ class AI:
             if grid.cells[y1][x] == Color.BLACK:
               hole_penalty += 1
             else:
+              if hole_penalty > 2:
+                hole_penalty *= 4
+              
               total_hole_penalty += hole_penalty
               break
     
