@@ -34,8 +34,6 @@ class AI:
         original_piece = self.grid.piece
         original_piece_rot = self.grid.piece.pos
 
-        holes0 = self.compute_holes_penalty(self.grid)
-
         self.grid.piece_pos = [x, 1]
         try:
           while True:
@@ -47,7 +45,7 @@ class AI:
         height = self.grid.compute_height()
         height_penalty = height * 100
         holes = self.compute_holes_penalty(self.grid)
-        holes_penalty = (holes - holes0) * 10
+        holes_penalty = holes * 10
         fitness = (
           filled_rows * 1000
           - height_penalty
