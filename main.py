@@ -8,6 +8,7 @@ from pieces import pieces
 from gameclock import GameClock, Clock
 from actionhandler import ActionHandler
 from score import Score
+from ai import AI
 
 CELL_SIZE = 24
 MAP_SIZE = 12, 22
@@ -36,11 +37,20 @@ def run():
   action_handler.start()
   score = Score(window_surface, (MAP_SIZE[0] - 1) * CELL_SIZE - 8, CELL_SIZE)
 
+  if '--ai' in sys.argv:
+    ai = AI(grid)
+    ai.run()
+  else:
+    ai = False
+
   running = True
   event = SDL_Event()
   while running:
     clock.update_time()
     t0 = clock.time
+
+    if ai:
+      ai.adjust_position()
 
     while SDL_PollEvent(ctypes.byref(event)):
       if event.type == SDL_QUIT:
@@ -60,6 +70,8 @@ def run():
           new_piece = random.choice(pieces)
           new_piece.reset_rotation()
           grid.add_piece(new_piece, 4, 1)
+          if ai:
+            ai.run()
         except Collision:
           print('-' * 40)
           print('Game over')
