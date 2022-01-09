@@ -30,7 +30,7 @@ class AI:
     for rot in range(4):
       self.grid.piece.pos = rot
       min_x, max_x = self.find_min_max_x()
-      for x in range(min_x, max_x):
+      for x in range(min_x, max_x + 1):
         # save state
         original_cells_state = [row.copy() for row in self.grid.cells]
         original_piece_pos_state = self.grid.piece_pos.copy()
@@ -113,7 +113,7 @@ class AI:
         self.grid.move_piece(1, 0)
     except Collision:
       self.grid.move_piece(original_x - max_x, 0)
-      #max_x -= 1
+      max_x -= 1
     
     return min_x, max_x
 
