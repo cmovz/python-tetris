@@ -129,3 +129,21 @@ class Grid:
           self.window_surface,
           ctypes.byref(dest_rect)
         )
+  
+  def compute_height(self):
+    for y, row in enumerate(self.cells):
+      for cell in row:
+        if cell == Color.BLACK:
+          return self.h - y
+    
+    return 0
+
+  def compute_horizontal_space(self):
+    count = 0
+    for y in range(self.h - 1, self.h - self.compute_height(), -1):
+      row = self.cells[y]
+      for cell in row:
+        if cell == Color.BLACK:
+          count += 1 * y
+
+    return count
