@@ -1,7 +1,10 @@
 import ctypes
+import random
 from sdl2 import *
-from grid import Collision
+from grid import Grid, Collision
 from colors import Color
+from pieces import pieces
+from settings import *
 
 CELL_SIZE = 24
 MAP_SIZE = 12, 22
@@ -64,11 +67,8 @@ class AI:
     
     self.best_fit = possible_fits[0]
     for possible_fit in possible_fits:
-      print(possible_fit.fitness)
       if possible_fit.fitness > self.best_fit.fitness:
         self.best_fit = possible_fit
-    
-    print('chose:', self.best_fit.fitness)
   
   @staticmethod
   def compute_holes_penalty(grid):
@@ -116,7 +116,9 @@ class AI:
       #max_x -= 1
     
     return min_x, max_x
-  
+
+
+class Bot(AI):  
   def adjust_position(self):
     moved = False
     x = self.grid.piece_pos[0]
@@ -141,3 +143,49 @@ class AI:
     SDL_PushEvent(ctypes.byref(new_event))
     new_event.type = SDL_KEYUP
     SDL_PushEvent(ctypes.byref(new_event))
+
+
+class VirtualBot(AI):
+  def adjust_position(self):
+    while self.grid.piece.pos != self.best_fit.rot:
+      self.grid.rotate_piece()
+
+    self.grid.piece_pos[0] = self.best_fit.x
+
+def simulate_game(count):
+  scores = []
+  for _ in range(count):
+    score = 0
+    grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
+    grid.add_piece(random.choice(pieces), 4, 1)
+    bot = VirtualBot(grid)
+    bot.run()
+
+    while True:
+      bot.adjust_position()
+      try:
+        while True:
+          grid.move_piece(0, 1)
+      except Collision:
+        try:
+          grid.move_piece(0, -1)
+          score += grid.integrate_piece()
+          new_piece = random.choice(pieces)
+          new_piece.reset_rotation()
+          grid.add_piece(new_piece, 4, 1)
+          bot.run()
+        except Collision:
+          scores.append(score)
+          break
+    
+  total_score = sum(scores)
+  avg_score = total_score // len(scores)
+  min_score = min(scores)
+  max_score = max(scores)
+
+  print('avg score  :', avg_score)
+  print('min score  :', min_score)
+  print('max score  :', max_score)
+
+if __name__ == '__main__':
+  simulate_game(32)

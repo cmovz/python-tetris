@@ -8,14 +8,8 @@ from pieces import pieces
 from gameclock import GameClock, Clock
 from actionhandler import ActionHandler
 from score import Score
-from ai import AI
-
-CELL_SIZE = 24
-MAP_SIZE = 12, 22
-FALLING_PER_SECOND = 1
-ACTIONS_PER_SECOND = 12
-MAX_FPS = 12
-DRAW_TIME = 1000000000 // MAX_FPS
+from ai import Bot
+from settings import *
 
 def run():
   SDL_Init(SDL_INIT_VIDEO)
@@ -38,7 +32,7 @@ def run():
   score = Score(window_surface, (MAP_SIZE[0] - 1) * CELL_SIZE - 8, CELL_SIZE)
 
   if '--ai' in sys.argv:
-    ai = AI(grid)
+    ai = Bot(grid)
     ai.run()
   else:
     ai = False
