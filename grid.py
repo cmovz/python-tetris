@@ -153,6 +153,7 @@ class Grid:
       for y in range(1, self.h - 1):
         if self.cells[y][x] != Color.BLACK:
           heights.append(self.h - y - 1)
+          break
     
     bumpiness = 0
     for i in range(1, len(heights)):
