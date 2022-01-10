@@ -6,12 +6,11 @@ from colors import Color
 from pieces import pieces
 from settings import *
 
-CELL_SIZE = 24
-MAP_SIZE = 12, 22
-FALLING_PER_SECOND = 1
-ACTIONS_PER_SECOND = 12
-MAX_FPS = 12
-DRAW_TIME = 1000000000 // MAX_FPS
+# use values from the 3rd generation
+A = 0.4785922677959835
+B = 0.16107937978890374
+C = 0.10296515667840733
+D = 0.9742573865234869
 
 class PossibleFit:
   def __init__(self, fitness, x, rot):
@@ -20,7 +19,7 @@ class PossibleFit:
     self.rot = rot
 
 class AI:
-  def __init__(self, grid, a=1.0, b=1.0, c=1.0, d=3.0):
+  def __init__(self, grid, a=A, b=B, c=C, d=D):
     self.grid = grid
     self.a = a
     self.b = b
@@ -55,6 +54,10 @@ class AI:
           - self.grid.compute_aggregate_height() * self.c
           - self.grid.compute_holes() * self.d
         )
+
+        # detect when it's going to lose
+        if self.grid.compute_height() >= self.grid.h - 4:
+          fitness -= 100
 
         possible_fit = PossibleFit(fitness, x, rot)
         possible_fits.append(possible_fit)
@@ -128,13 +131,13 @@ class VirtualBot(AI):
 
     self.grid.piece_pos[0] = self.best_fit.x
 
-def simulate_game(count):
+def simulate_game(count, a=A, b=B, c=C, d=D, print_stats=True):
   scores = []
   for _ in range(count):
     score = 0
     grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
     grid.add_piece(random.choice(pieces), 4, 1)
-    bot = VirtualBot(grid)
+    bot = VirtualBot(grid, a, b, c, d)
     bot.run()
 
     while True:
@@ -159,9 +162,14 @@ def simulate_game(count):
   min_score = min(scores)
   max_score = max(scores)
 
-  print('avg score  :', avg_score)
-  print('min score  :', min_score)
-  print('max score  :', max_score)
+  if print_stats:
+    print('-' * 40)
+    print('avg score  :', avg_score)
+    print('min score  :', min_score)
+    print('max score  :', max_score)
+    print('-' * 40)
+
+  return avg_score
 
 if __name__ == '__main__':
   simulate_game(32)
