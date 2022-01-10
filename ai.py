@@ -45,11 +45,8 @@ class AI:
           self.grid.move_piece(0, -1)
       
         filled_rows = self.grid.integrate_piece()
-        height = self.grid.compute_height()
-        height_penalty = height if height < 10 else height ** 2
         fitness = (
           filled_rows * 2000
-          - height_penalty
           - self.compute_holes_penalty(self.grid)
           - self.grid.compute_horizontal_space()
         )
@@ -72,23 +69,20 @@ class AI:
   def compute_holes_penalty(grid):
     visited = set()
     total_hole_penalty = 0
-    height = grid.compute_height()
 
     for y in range(grid.h - 1, 2, -1):
       row = grid.cells[y]
       for x in range(1, grid.w - 1):
         if row[x] == Color.BLACK:
           hole_penalty = 1
-          for y1 in range(y - 1, grid.h - height, -1):
+          for y1 in range(y - 1, 1, -1):
             if (x, y1) in visited:
               break
 
             visited.add((x, y1))
             if grid.cells[y1][x] == Color.BLACK:
-              hole_penalty += 50
+              hole_penalty += 1
             else:
-              if hole_penalty > 2:
-                hole_penalty /= 5
               total_hole_penalty += hole_penalty
               break
     
