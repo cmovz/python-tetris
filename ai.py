@@ -47,6 +47,7 @@ class AI:
         filled_rows = self.grid.integrate_piece()
         fitness = (
           filled_rows * 2000
+          - self.grid.compute_bumpiness()
           - self.compute_holes_penalty(self.grid)
           - self.grid.compute_horizontal_space()
         )

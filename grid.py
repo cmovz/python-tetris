@@ -137,6 +137,19 @@ class Grid:
           return self.h - y - 1
     
     return 0
+  
+  def compute_bumpiness(self):
+    heights = []
+    for x in range(1, self.w - 1):
+      for y in range(1, self.h - 1):
+        if self.cells[y][x] != Color.BLACK:
+          heights.append(self.h - y - 1)
+    
+    bumpiness = 0
+    for i in range(1, len(heights)):
+      bumpiness += abs(heights[i-1] - heights[i])
+    
+    return bumpiness
 
   def compute_horizontal_space(self):
     count = 0
