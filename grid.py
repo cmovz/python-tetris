@@ -131,10 +131,10 @@ class Grid:
         )
   
   def compute_height(self):
-    for y, row in enumerate(self.cells):
-      for cell in row:
-        if cell == Color.BLACK:
-          return self.h - y
+    for y in range(1, self.h - 1):
+      for x in range(1, self.w -1):
+        if self.cells[y][x] != Color.BLACK:
+          return self.h - y - 1
     
     return 0
 
