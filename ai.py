@@ -20,7 +20,7 @@ class PossibleFit:
     self.rot = rot
 
 class AI:
-  def __init__(self, grid, a=1.0, b=1.0, c=1.0, d=1.0):
+  def __init__(self, grid, a=1.0, b=1.0, c=1.0, d=3.0):
     self.grid = grid
     self.a = a
     self.b = b
