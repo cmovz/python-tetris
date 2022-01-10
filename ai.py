@@ -20,8 +20,12 @@ class PossibleFit:
     self.rot = rot
 
 class AI:
-  def __init__(self, grid):
+  def __init__(self, grid, a=1.0, b=1.0, c=1.0, d=1.0):
     self.grid = grid
+    self.a = a
+    self.b = b
+    self.c = c
+    self.d = d
 
   def run(self):
     # possible positions with their fitnesses
@@ -46,10 +50,10 @@ class AI:
       
         filled_rows = self.grid.integrate_piece()
         fitness = (
-          filled_rows
-          - self.grid.compute_bumpiness()
-          - self.grid.compute_aggregate_height()
-          - self.grid.compute_holes()
+          filled_rows * self.a
+          - self.grid.compute_bumpiness() * self.b
+          - self.grid.compute_aggregate_height() * self.c
+          - self.grid.compute_holes() * self.d
         )
 
         possible_fit = PossibleFit(fitness, x, rot)
