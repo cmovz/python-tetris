@@ -48,8 +48,8 @@ class AI:
         fitness = (
           filled_rows * 2000
           - self.grid.compute_bumpiness()
-          - self.compute_holes_penalty(self.grid)
-          - self.grid.compute_horizontal_space()
+          - self.grid.compute_aggregate_height()
+          - self.grid.compute_holes()
         )
 
         possible_fit = PossibleFit(fitness, x, rot)
@@ -65,29 +65,6 @@ class AI:
     for possible_fit in possible_fits:
       if possible_fit.fitness > self.best_fit.fitness:
         self.best_fit = possible_fit
-  
-  @staticmethod
-  def compute_holes_penalty(grid):
-    visited = set()
-    total_hole_penalty = 0
-
-    for y in range(grid.h - 1, 2, -1):
-      row = grid.cells[y]
-      for x in range(1, grid.w - 1):
-        if row[x] == Color.BLACK:
-          hole_penalty = 1
-          for y1 in range(y - 1, 1, -1):
-            if (x, y1) in visited:
-              break
-
-            visited.add((x, y1))
-            if grid.cells[y1][x] == Color.BLACK:
-              hole_penalty += 1
-            else:
-              total_hole_penalty += hole_penalty
-              break
-    
-    return total_hole_penalty
 
   def find_min_max_x(self):
     original_x = self.grid.piece_pos[0]

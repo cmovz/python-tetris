@@ -138,6 +138,15 @@ class Grid:
     
     return 0
   
+  def compute_aggregate_height(self):
+    agg_height = 0
+    for x in range(1, self.w - 1):
+      for y in range(1, self.h - 1):
+        if self.cells[y][x] != Color.BLACK:
+          agg_height += self.h - y - 1
+    
+    return agg_height
+  
   def compute_bumpiness(self):
     heights = []
     for x in range(1, self.w - 1):
@@ -150,6 +159,28 @@ class Grid:
       bumpiness += abs(heights[i-1] - heights[i])
     
     return bumpiness
+  
+  def compute_holes(self):
+    visited = set()
+    total = 0
+
+    for y in range(self.h - 1, 2, -1):
+      row = self.cells[y]
+      for x in range(1, self.w - 1):
+        if row[x] == Color.BLACK:
+          hole_size = 1
+          for y1 in range(y - 1, 1, -1):
+            if (x, y1) in visited:
+              break
+
+            visited.add((x, y1))
+            if self.cells[y1][x] == Color.BLACK:
+              hole_size += 1
+            else:
+              total += hole_size
+              break
+    
+    return total
 
   def compute_horizontal_space(self):
     count = 0
@@ -157,6 +188,6 @@ class Grid:
       row = self.cells[y]
       for cell in row:
         if cell == Color.BLACK:
-          count += 1 * y
+          count += 1
 
     return count
