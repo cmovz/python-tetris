@@ -192,3 +192,35 @@ class Grid:
           count += 1
 
     return count
+  
+  def compute_wells_depth(self):
+    total_depth = 0
+
+    for x in range(1, self.w - 1):
+      in_well = False
+      for y in range(1, self.h - 1):
+        if in_well:
+          if (
+            self.cells[y][x] == Color.BLACK
+            and self.cells[y][x-1] != Color.BLACK
+            and self.cells[y][x+1] != Color.BLACK
+          ):
+            depth += 1
+          else:
+            if depth >= 3:
+              total_depth += depth
+            
+            break
+
+        elif (
+          self.cells[y][x] == Color.BLACK
+          and self.cells[y][x-1] != Color.BLACK
+          and self.cells[y][x+1] != Color.BLACK
+        ):
+          in_well = True
+          depth = 1
+
+        elif self.cells[y][x] != Color.BLACK:
+          break
+
+    return total_depth

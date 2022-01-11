@@ -5,7 +5,9 @@ Run `python3 brkga.py` or `pypy3 brkga.py`, which is 10x faster.
 
 import math
 import random
+import pickle
 import ai
+from pathlib import Path
 
 class BRKGA:
   def __init__(
@@ -17,6 +19,7 @@ class BRKGA:
     self.elite_count = math.floor(elite_percentage * individual_count)
     self.mutant_count = math.floor(mutant_percentage * individual_count)
     self.elite_chances = elite_chances
+    self.generation = 0
 
     self.population = []
     for _ in range(individual_count):
@@ -26,8 +29,10 @@ class BRKGA:
       
   
   def evolve(self):
-    self.population.sort(reverse=True)
+    # self.population.sort(reverse=True)
+    # population must be sorted descending by fitness
     
+    self.generation += 1
     elite_pool = self.population[:self.elite_count]
     general_pool = self.population[self.elite_count:]
     temp_pool = []
@@ -37,8 +42,8 @@ class BRKGA:
       elite_individual = random.choice(elite_pool)
       random_individual = random.choice(general_pool)
 
-      new_individual = []
-      for allele in range(1, len(self.alleles_per_individual + 1)):
+      new_individual = [0.0]
+      for allele in range(1, self.alleles_per_individual + 1):
         if random.uniform(0,1) < self.elite_chances:
           new_individual.append(elite_individual[allele])
         else:
@@ -53,22 +58,39 @@ class BRKGA:
 
     self.population = elite_pool + temp_pool + mutant_pool
 
-if __name__ == '__main__':
-  brkga = BRKGA(4, 100, 10, 10, 0.7)
-  for generation in range(100):
-    for individual in brkga.population:
-      _, a, b, c, d = individual
-      fitness = ai.simulate_game(16, a, b, c, d, False)
+class TetrisBRKGA(BRKGA):
+  def __init__(self, fitness_simulation_count):
+    BRKGA.__init__(self, 5, 100, 0.1, 0.1, 0.7)
+    self.fitness_simulation_count = fitness_simulation_count
+  
+  def evolve(self):
+    for individual in self.population:
+      _, a, b, c, d, e = individual
+      fitness = ai.simulate_game(16, a, b, c, d, e, False)
       individual[0] = fitness
     
+    self.population.sort(reverse=True)
+    self.save_population()
+    BRKGA.evolve(self)
+  
+  def save_population(self):
+    file = open('./tmp/{}'.format(self.generation), 'wb')
+    pickle.dump(self, file)
+    file.close()
+
+if __name__ == '__main__':
+  Path('./tmp').mkdir(exist_ok=True)
+  brkga = TetrisBRKGA(16)
+  for generation in range(100):  
     brkga.evolve()
 
     best_individual = brkga.population[0]
     print('-' * 20)
     print('generation:', generation)
     print('fitness:', best_individual[0])
-    print('a:', best_individual[1])
-    print('b:', best_individual[2])
-    print('c:', best_individual[3])
-    print('d:', best_individual[4])
+    print('A =', best_individual[1])
+    print('B =', best_individual[2])
+    print('C =', best_individual[3])
+    print('D =', best_individual[4])
+    print('E =', best_individual[5])
     print('-' * 20, flush=True)

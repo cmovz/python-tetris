@@ -2,15 +2,15 @@ import ctypes
 import random
 from sdl2 import *
 from grid import Grid, Collision
-from colors import Color
 from pieces import pieces
 from settings import *
 
-# use values from the 3rd generation
-A = 0.4785922677959835
-B = 0.16107937978890374
-C = 0.10296515667840733
-D = 0.9742573865234869
+# use values from the 17th generation
+A = 0.5592476146265473
+B = 0.15835554539935492
+C = 0.047299835861682404
+D = 0.9972852329026102
+E = 0.2007068856092924
 
 class PossibleFit:
   def __init__(self, fitness, x, rot):
@@ -19,12 +19,13 @@ class PossibleFit:
     self.rot = rot
 
 class AI:
-  def __init__(self, grid, a=A, b=B, c=C, d=D):
+  def __init__(self, grid, a=A, b=B, c=C, d=D, e=E):
     self.grid = grid
     self.a = a
     self.b = b
     self.c = c
     self.d = d
+    self.e = e
 
   def run(self):
     # possible positions with their fitnesses
@@ -53,6 +54,7 @@ class AI:
           - self.grid.compute_bumpiness() * self.b
           - self.grid.compute_aggregate_height() * self.c
           - self.grid.compute_holes() * self.d
+          - self.grid.compute_wells_depth() * self.e
         )
 
         # detect when it's going to lose
@@ -131,7 +133,7 @@ class VirtualBot(AI):
 
     self.grid.piece_pos[0] = self.best_fit.x
 
-def simulate_game(count, a=A, b=B, c=C, d=D, print_stats=True):
+def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True):
   scores = []
   for _ in range(count):
     score = 0
@@ -157,13 +159,21 @@ def simulate_game(count, a=A, b=B, c=C, d=D, print_stats=True):
           scores.append(score)
           break
     
-  total_score = sum(scores)
-  avg_score = total_score // len(scores)
   min_score = min(scores)
   max_score = max(scores)
 
+  # remove outliers
+  n = len(scores) // 5
+  scores = scores[n:-n]
+
+  total_score = sum(scores)
+  avg_score = total_score // len(scores)
+
   if print_stats:
     print('-' * 40)
+    print('median     :', 
+      (scores[len(scores) // 2] + scores[(len(scores) + 1) // 2]) // 2
+    )
     print('avg score  :', avg_score)
     print('min score  :', min_score)
     print('max score  :', max_score)
