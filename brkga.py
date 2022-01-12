@@ -8,6 +8,7 @@ import random
 import pickle
 import ai
 from pathlib import Path
+from multiprocessing import Pool 
 
 class BRKGA:
   def __init__(
@@ -64,10 +65,16 @@ class TetrisBRKGA(BRKGA):
     self.fitness_simulation_count = fitness_simulation_count
   
   def evolve(self):
-    for individual in self.population:
-      _, a, b, c, d, e = individual
-      fitness = ai.simulate_game(16, a, b, c, d, e, False, True)
-      individual[0] = fitness
+    with Pool(processes=2) as pool:
+      results = []
+      for individual in self.population:
+        _, a, b, c, d, e = individual
+        r = pool.apply_async(ai.simulate_game, (16, a, b, c, d, e, False, True))
+        results.append(r)
+      
+      for i, r in enumerate(results):
+        fitness = r.get()
+        self.population[i][0] = fitness
     
     self.population.sort(reverse=True)
     self.save_population()
