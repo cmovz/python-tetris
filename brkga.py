@@ -60,7 +60,7 @@ class BRKGA:
 
 class TetrisBRKGA(BRKGA):
   def __init__(self, fitness_simulation_count):
-    BRKGA.__init__(self, 5, 100, 0.1, 0.1, 0.7)
+    BRKGA.__init__(self, 5, 50, 0.2, 0.4, 0.7)
     self.fitness_simulation_count = fitness_simulation_count
   
   def evolve(self):
@@ -93,4 +93,4 @@ if __name__ == '__main__':
     print('C =', best_individual[3])
     print('D =', best_individual[4])
     print('E =', best_individual[5])
-    print('-' * 20, flush=True)
+    print('-' * 20)
