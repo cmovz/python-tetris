@@ -66,7 +66,7 @@ class TetrisBRKGA(BRKGA):
   def evolve(self):
     for individual in self.population:
       _, a, b, c, d, e = individual
-      fitness = ai.simulate_game(16, a, b, c, d, e, False)
+      fitness = ai.simulate_game(16, a, b, c, d, e, False, True)
       individual[0] = fitness
     
     self.population.sort(reverse=True)

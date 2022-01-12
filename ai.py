@@ -133,7 +133,7 @@ class VirtualBot(AI):
 
     self.grid.piece_pos[0] = self.best_fit.x
 
-def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True):
+def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):
   scores = []
   for _ in range(count):
     score = 0
@@ -155,11 +155,16 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True):
           new_piece.reset_rotation()
           grid.add_piece(new_piece, 4, 1)
           bot.run()
+
+          if stop and score >= 800:
+            scores.append(score)
+            break
+
         except Collision:
           scores.append(score)
-          break
+          break      
     
-  scores = sorted(scores)
+  scores.sort()
   min_score = scores[0]
   max_score = scores[-1]
   total_score = sum(scores)
