@@ -159,27 +159,23 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True):
           scores.append(score)
           break
     
-  min_score = min(scores)
-  max_score = max(scores)
-
-  # remove outliers
-  n = len(scores) // 5
-  scores = scores[n:-n]
-
+  scores = sorted(scores)
+  min_score = scores[0]
+  max_score = scores[-1]
   total_score = sum(scores)
-  avg_score = total_score // len(scores)
+  avg_score = total_score / len(scores)
+  median_score = (scores[(len(scores) - 1)//2] + scores[len(scores)//2]) / 2
 
   if print_stats:
     print('-' * 40)
-    print('median     :', 
-      (scores[len(scores) // 2] + scores[(len(scores) + 1) // 2]) // 2
-    )
+    print('median     :', median_score)
     print('avg score  :', avg_score)
     print('min score  :', min_score)
     print('max score  :', max_score)
     print('-' * 40)
+    print(sorted(scores))
 
-  return avg_score
+  return median_score
 
 if __name__ == '__main__':
   simulate_game(32)
