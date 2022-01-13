@@ -17,6 +17,9 @@ class PossibleFit:
     self.x = x
     self.rot = rot
 
+  def __lt__(self, other):
+    return self.fitness < other.fitness
+
 class AI:
   def __init__(self, grid, a=A, b=B, c=C, d=D, e=E):
     self.grid = grid
@@ -25,20 +28,20 @@ class AI:
     self.c = c
     self.d = d
     self.e = e
-
+  
   def run(self):
     # possible positions with their fitnesses
     possible_fits = []
   
-    for rot in range(4):
-      self.grid.piece.pos = rot
+    for rot in self.grid.piece.unique_rotations:
+      self.grid.piece.rot = rot
       min_x, max_x = self.find_min_max_x()
       for x in range(min_x, max_x + 1):
         # save state
         original_cells_state = [row.copy() for row in self.grid.cells]
         original_piece_pos_state = self.grid.piece_pos.copy()
         original_piece = self.grid.piece
-        original_piece_rot = self.grid.piece.pos
+        original_piece_rot = self.grid.piece.rot
 
         self.grid.piece_pos = [x, 1]
         try:
@@ -67,7 +70,7 @@ class AI:
         self.grid.cells = original_cells_state
         self.grid.piece_pos = original_piece_pos_state
         self.grid.piece = original_piece
-        self.grid.piece.pos = original_piece_rot
+        self.grid.piece.rot = original_piece_rot
     
     self.best_fit = possible_fits[0]
     for possible_fit in possible_fits:
@@ -109,7 +112,7 @@ class Bot(AI):
       self.send_keypress(SDL_SCANCODE_LEFT)
       moved = True
     
-    if self.grid.piece.pos != self.best_fit.rot:
+    if self.grid.piece.rot != self.best_fit.rot:
       self.send_keypress(SDL_SCANCODE_UP)
       moved = True
 
@@ -127,9 +130,7 @@ class Bot(AI):
 
 class VirtualBot(AI):
   def adjust_position(self):
-    while self.grid.piece.pos != self.best_fit.rot:
-      self.grid.rotate_piece()
-
+    self.grid.piece.rot = self.best_fit.rot
     self.grid.piece_pos[0] = self.best_fit.x
 
 def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):

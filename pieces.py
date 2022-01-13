@@ -1,29 +1,30 @@
 from colors import Color
 
 class Piece:
-  def __init__(self, matrices, color):
+  def __init__(self, matrices, color, unique_rotations):
     assert len(matrices) == 4
     for m in matrices:
       assert len(m) == 4
       for row in m:
         assert len(row) == 4
 
-    self.pos = 0
+    self.rot = 0
     self.matrices = matrices
     self.color = color
+    self.unique_rotations = unique_rotations
   
   @property
   def matrix(self):
-    return self.matrices[self.pos]
+    return self.matrices[self.rot]
   
   def rotate(self):
-    self.pos = (self.pos + 1) % 4
+    self.rot = (self.rot + 1) % 4
   
   def rotate_backwards(self):
-    self.pos = (self.pos + 3) % 4
+    self.rot = (self.rot + 3) % 4
   
   def reset_rotation(self):
-    self.pos = 0
+    self.rot = 0
 
 i = Piece(
   (
@@ -52,7 +53,8 @@ i = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_CYAN
+  Color.DARK_CYAN,
+  (0, 1)
 )
 
 j = Piece(
@@ -82,7 +84,8 @@ j = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_RED
+  Color.DARK_RED,
+  (0, 1, 2, 3)
 )
 
 l = Piece(
@@ -112,7 +115,8 @@ l = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_BROWN
+  Color.DARK_BROWN,
+  (0, 1, 2, 3)
 )
 
 o = Piece(
@@ -142,7 +146,8 @@ o = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_MAGENTA
+  Color.DARK_MAGENTA,
+  (0,)
 )
 
 s = Piece(
@@ -172,7 +177,8 @@ s = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_GRAY
+  Color.DARK_GRAY,
+  (0, 1)
 )
 
 t = Piece(
@@ -202,7 +208,8 @@ t = Piece(
       (0, 0, 0, 0),
     ),
   ),
-  Color.DARK_GREEN
+  Color.DARK_GREEN,
+  (0, 1, 2, 3)
 )
 
 z = Piece(
@@ -232,7 +239,8 @@ z = Piece(
       (0, 0, 0, 0),
     )
   ),
-  Color.DARK_BLUE
+  Color.DARK_BLUE,
+  (0, 1)
 )
 
 pieces = i, j, l, o, s, t, z
