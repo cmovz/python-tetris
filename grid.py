@@ -216,6 +216,7 @@ class Grid:
             and self.cells[y][x+1] != Color.BLACK
           ):
             depth += 1
+            print(depth)
           else:
             if depth >= 3:
               total_depth += depth
@@ -229,8 +230,12 @@ class Grid:
         ):
           in_well = True
           depth = 1
+          print('in_well')
 
         elif self.cells[y][x] != Color.BLACK:
           break
+      
+      if in_well and depth >= 3:
+        total_depth += depth
 
     return total_depth

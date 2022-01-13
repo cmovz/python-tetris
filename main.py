@@ -53,6 +53,7 @@ def run():
       action_handler.handle_keypress_event(event)
     
     action_handler.execute_actions()
+    print('wells depth:', grid.compute_wells_depth())
     
     for _ in range(game_clock.get_ticks()):
       try:
