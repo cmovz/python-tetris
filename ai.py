@@ -37,7 +37,7 @@ class AI:
     for rot in self.grid.piece.unique_rotations:
       original_rot = self.grid.piece.rot
       self.grid.piece.rot = rot
-      min_x, max_x = self.find_min_max_x()
+      min_x, max_x = self.find_min_max_x(self.grid)
       for x in range(min_x, max_x + 1):
         working_grid = self.grid.copy()
 
@@ -77,36 +77,84 @@ class AI:
     possible_fits.sort(reverse=True)
     possible_fits = possible_fits[:5]
     for fit in possible_fits:
-      pass#fit.fitness = self.compute_median_fitness(fit.grid)
+      fit.fitness = self.compute_median_fitness(fit.grid)
 
     self.best_fit = possible_fits[0]
     for possible_fit in possible_fits:
       if possible_fit.fitness > self.best_fit.fitness:
         self.best_fit = possible_fit
   
-  @staticmethod
-  def compute_median_fitness(grid):
-    pass
+  def compute_median_fitness(self, grid):
+    possible_fits = []
+  
+    for piece in pieces:
+      grid = grid.copy()
+      grid.add_piece(piece, 4, 1)
+      for rot in grid.piece.unique_rotations:
+        grid.piece.rot = rot
+        min_x, max_x = self.find_min_max_x(grid)
+        for x in range(min_x, max_x + 1):
+          working_grid = grid.copy()
 
-  def find_min_max_x(self):
-    original_x = self.grid.piece_pos[0]
+          working_grid.piece_pos = [x, 1]
+          game_over = False
+          try:
+            while True:
+              working_grid.move_piece(0, 1)
+          except Collision:
+            try:
+              working_grid.move_piece(0, -1)
+            except Collision:
+              game_over = True
+        
+          if not game_over:
+            filled_rows = working_grid.integrate_piece()
+            fitness = (
+              filled_rows * self.a
+              - working_grid.compute_bumpiness() * self.b
+              - working_grid.compute_aggregate_height() * self.c
+              - working_grid.compute_holes() * self.d
+              - working_grid.compute_wells_depth() * self.e
+            )
+
+            # detect when it's going to lose
+            if working_grid.compute_height() >= working_grid.h - 4:
+              fitness -= 100
+          
+          else:
+            fitness = -10000000000.0
+
+          possible_fit = PossibleFit(fitness, x, rot, working_grid)
+          possible_fits.append(possible_fit)
+    
+    possible_fits.sort()
+    median = (
+      possible_fits[(len(possible_fits) - 1) // 2].fitness
+      + possible_fits[len(possible_fits) // 2].fitness
+    ) / 2
+
+    return median
+
+  @staticmethod
+  def find_min_max_x(grid):
+    original_x = grid.piece_pos[0]
     min_x = original_x
     max_x = original_x
 
     try:
       while True:
         min_x -= 1
-        self.grid.move_piece(-1, 0)
+        grid.move_piece(-1, 0)
     except Collision:
-      self.grid.move_piece(original_x - min_x, 0)
+      grid.move_piece(original_x - min_x, 0)
       min_x += 1
 
     try:
       while True:
         max_x += 1
-        self.grid.move_piece(1, 0)
+        grid.move_piece(1, 0)
     except Collision:
-      self.grid.move_piece(original_x - max_x, 0)
+      grid.move_piece(original_x - max_x, 0)
       max_x -= 1
     
     return min_x, max_x
