@@ -2,6 +2,7 @@ import ctypes
 from sdl2 import SDL_BlitSurface, SDL_Rect
 from colors import Color
 from textures import textures
+from pieces import Piece
 
 class Collision(Exception):
   pass
@@ -24,6 +25,18 @@ class Grid:
     
     # bottom wall
     self.cells.append([Color.GRAY for _ in range(self.w)])
+  
+  def copy(self):
+    grid_copy = Grid(self.window_surface, self.w, self.h, self.cell_size)
+    grid_copy.cells = [row.copy() for row in self.cells]
+    grid_copy.piece = Piece(
+      self.piece.matrices,
+      self.piece.color,
+      self.piece.unique_rotations
+    )
+    grid_copy.piece.rot = self.piece.rot
+    grid_copy.piece_pos = self.piece_pos.copy()
+    return grid_copy
   
   def add_piece(self, piece, x, y):
     self.piece = piece

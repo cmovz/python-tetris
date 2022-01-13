@@ -12,10 +12,11 @@ D = 0.9709974551768048
 E = 0.17149011649058088
 
 class PossibleFit:
-  def __init__(self, fitness, x, rot):
+  def __init__(self, fitness, x, rot, grid):
     self.fitness = fitness
     self.x = x
     self.rot = rot
+    self.grid = grid
 
   def __lt__(self, other):
     return self.fitness < other.fitness
@@ -34,48 +35,58 @@ class AI:
     possible_fits = []
   
     for rot in self.grid.piece.unique_rotations:
+      original_rot = self.grid.piece.rot
       self.grid.piece.rot = rot
       min_x, max_x = self.find_min_max_x()
       for x in range(min_x, max_x + 1):
-        # save state
-        original_cells_state = [row.copy() for row in self.grid.cells]
-        original_piece_pos_state = self.grid.piece_pos.copy()
-        original_piece = self.grid.piece
-        original_piece_rot = self.grid.piece.rot
+        working_grid = self.grid.copy()
 
-        self.grid.piece_pos = [x, 1]
+        working_grid.piece_pos = [x, 1]
+        game_over = False
         try:
           while True:
-            self.grid.move_piece(0, 1)
+            working_grid.move_piece(0, 1)
         except Collision:
-          self.grid.move_piece(0, -1)
+          try:
+            working_grid.move_piece(0, -1)
+          except Collision:
+            game_over = True
       
-        filled_rows = self.grid.integrate_piece()
-        fitness = (
-          filled_rows * self.a
-          - self.grid.compute_bumpiness() * self.b
-          - self.grid.compute_aggregate_height() * self.c
-          - self.grid.compute_holes() * self.d
-          - self.grid.compute_wells_depth() * self.e
-        )
+        if not game_over:
+          filled_rows = working_grid.integrate_piece()
+          fitness = (
+            filled_rows * self.a
+            - working_grid.compute_bumpiness() * self.b
+            - working_grid.compute_aggregate_height() * self.c
+            - working_grid.compute_holes() * self.d
+            - working_grid.compute_wells_depth() * self.e
+          )
 
-        # detect when it's going to lose
-        if self.grid.compute_height() >= self.grid.h - 4:
-          fitness -= 100
+          # detect when it's going to lose
+          if working_grid.compute_height() >= working_grid.h - 4:
+            fitness -= 100
+        
+        else:
+          fitness = -10000000000.0
 
-        possible_fit = PossibleFit(fitness, x, rot)
+        possible_fit = PossibleFit(fitness, x, rot, working_grid)
         possible_fits.append(possible_fit)
 
-        # restore state
-        self.grid.cells = original_cells_state
-        self.grid.piece_pos = original_piece_pos_state
-        self.grid.piece = original_piece
-        self.grid.piece.rot = original_piece_rot
+      self.grid.piece.rot = original_rot
     
+    possible_fits.sort(reverse=True)
+    possible_fits = possible_fits[:5]
+    for fit in possible_fits:
+      pass#fit.fitness = self.compute_median_fitness(fit.grid)
+
     self.best_fit = possible_fits[0]
     for possible_fit in possible_fits:
       if possible_fit.fitness > self.best_fit.fitness:
         self.best_fit = possible_fit
+  
+  @staticmethod
+  def compute_median_fitness(grid):
+    pass
 
   def find_min_max_x(self):
     original_x = self.grid.piece_pos[0]
