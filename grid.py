@@ -183,16 +183,6 @@ class Grid:
     
     return total
 
-  def compute_horizontal_space(self):
-    count = 0
-    for y in range(self.h - 1, 1, -1):
-      row = self.cells[y]
-      for cell in row:
-        if cell == Color.BLACK:
-          count += 1
-
-    return count
-  
   def compute_wells_depth(self):
     total_depth = 0
 
