@@ -1,5 +1,6 @@
 import ctypes
 import random
+import time
 from sdl2 import *
 from grid import Grid, Collision
 from pieces import pieces
@@ -54,18 +55,7 @@ class AI:
       
         if not game_over:
           filled_rows = working_grid.integrate_piece()
-          fitness = (
-            filled_rows * self.a
-            - working_grid.compute_bumpiness() * self.b
-            - working_grid.compute_aggregate_height() * self.c
-            - working_grid.compute_holes() * self.d
-            - working_grid.compute_wells_depth() * self.e
-          )
-
-          # detect when it's going to lose
-          if working_grid.compute_height() >= working_grid.h - 4:
-            fitness -= 100
-        
+          fitness = self.compute_fitness(working_grid, filled_rows)
         else:
           fitness = -10000000000.0
 
@@ -75,7 +65,8 @@ class AI:
       self.grid.piece.rot = original_rot
     
     possible_fits.sort(reverse=True)
-    possible_fits = possible_fits[:5]
+    self.original_choice = possible_fits[0]
+    possible_fits = possible_fits[:10]
     for fit in possible_fits:
       fit.fitness = self.compute_median_fitness(fit.grid)
 
@@ -83,6 +74,14 @@ class AI:
     for possible_fit in possible_fits:
       if possible_fit.fitness > self.best_fit.fitness:
         self.best_fit = possible_fit
+    
+    if self.best_fit != self.original_choice:
+      print('different choice')
+      self.original_choice.grid.draw()
+      SDL_UpdateWindowSurface(self.original_choice.grid.window)
+      time.sleep(2)
+    else:
+      print('same choice')
   
   def compute_median_fitness(self, grid):
     possible_fits = []
@@ -109,18 +108,7 @@ class AI:
         
           if not game_over:
             filled_rows = working_grid.integrate_piece()
-            fitness = (
-              filled_rows * self.a
-              - working_grid.compute_bumpiness() * self.b
-              - working_grid.compute_aggregate_height() * self.c
-              - working_grid.compute_holes() * self.d
-              - working_grid.compute_wells_depth() * self.e
-            )
-
-            # detect when it's going to lose
-            if working_grid.compute_height() >= working_grid.h - 4:
-              fitness -= 100
-          
+            fitness = self.compute_fitness(working_grid, filled_rows)
           else:
             fitness = -10000000000.0
 
@@ -128,12 +116,24 @@ class AI:
           possible_fits.append(possible_fit)
     
     possible_fits.sort()
-    median = (
+    return (
       possible_fits[(len(possible_fits) - 1) // 2].fitness
       + possible_fits[len(possible_fits) // 2].fitness
     ) / 2
+  
+  def compute_fitness(self, grid, filled_rows):
+    fitness = (
+      filled_rows * self.a
+      - grid.compute_bumpiness() * self.b
+      - grid.compute_aggregate_height() * self.c
+      - grid.compute_holes() * self.d
+      - grid.compute_wells_depth() * self.e
+    )
 
-    return median
+    if grid.compute_height() >= grid.h - 4:
+      fitness -= 100
+    
+    return fitness
 
   @staticmethod
   def find_min_max_x(grid):
@@ -196,7 +196,7 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):
   scores = []
   for _ in range(count):
     score = 0
-    grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
+    grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE, None)
     grid.add_piece(random.choice(pieces), 4, 1)
     bot = VirtualBot(grid, a, b, c, d)
     bot.run()
@@ -242,4 +242,4 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):
   return median_score
 
 if __name__ == '__main__':
-  simulate_game(32)
+  simulate_game(1)

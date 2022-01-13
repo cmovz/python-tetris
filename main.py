@@ -21,7 +21,7 @@ def run():
   )
   window_surface = SDL_GetWindowSurface(window)
 
-  grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
+  grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE, window)
   grid.add_piece(random.choice(pieces), 4, 1)
 
   clock = Clock()

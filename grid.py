@@ -8,7 +8,8 @@ class Collision(Exception):
   pass
 
 class Grid:
-  def __init__(self, window_surface, width, height, cell_size):
+  def __init__(self, window_surface, width, height, cell_size, window):
+    self.window = window
     self.window_surface = window_surface
     self.w = width
     self.h = height
@@ -27,7 +28,7 @@ class Grid:
     self.cells.append([Color.GRAY for _ in range(self.w)])
   
   def copy(self):
-    grid_copy = Grid(self.window_surface, self.w, self.h, self.cell_size)
+    grid_copy = Grid(self.window_surface, self.w, self.h, self.cell_size, self.window)
     grid_copy.cells = [row.copy() for row in self.cells]
     try:
       grid_copy.piece = Piece(
@@ -127,8 +128,10 @@ class Grid:
           ctypes.byref(dest_rect)
         )
     
-    if self.piece:
+    try:
       self.draw_piece()
+    except AttributeError:
+      pass
   
   def draw_piece(self):
     dest_rect = SDL_Rect(w=self.cell_size, h=self.cell_size)
