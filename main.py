@@ -21,7 +21,7 @@ def run():
   )
   window_surface = SDL_GetWindowSurface(window)
 
-  grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE, window)
+  grid = Grid(window_surface, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
   grid.add_piece(random.choice(pieces), 4, 1)
 
   clock = Clock()
@@ -53,7 +53,6 @@ def run():
       action_handler.handle_keypress_event(event)
     
     action_handler.execute_actions()
-    print('wells depth:', grid.compute_wells_depth())
     
     for _ in range(game_clock.get_ticks()):
       try:

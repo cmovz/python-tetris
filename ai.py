@@ -5,12 +5,13 @@ from sdl2 import *
 from grid import Grid, Collision
 from pieces import pieces
 from settings import *
+from multiprocessing import Pool
 
-A = 0.21057928931169612
-B = 0.1360316616998426
-C = 0.05293062170804297
-D = 0.9709974551768048
-E = 0.17149011649058088
+A = 0.11146253876595202
+B = 0.12392743901965475
+C = 0.029653844701920895
+D = 0.9624658982587024
+E = 0.32341412515044743
 
 class PossibleFit:
   def __init__(self, fitness, x, rot, grid):
@@ -18,6 +19,7 @@ class PossibleFit:
     self.x = x
     self.rot = rot
     self.grid = grid
+    self.hole_count = grid.compute_holes()
 
   def __lt__(self, other):
     return self.fitness < other.fitness
@@ -34,8 +36,8 @@ class AI:
   def run(self):
     # possible positions with their fitnesses
     possible_fits = []
-  
     for rot in self.grid.piece.unique_rotations:
+  
       original_rot = self.grid.piece.rot
       self.grid.piece.rot = rot
       min_x, max_x = self.find_min_max_x(self.grid)
@@ -66,23 +68,24 @@ class AI:
     
     possible_fits.sort(reverse=True)
     self.original_choice = possible_fits[0]
-    possible_fits = possible_fits[:10]
+
+    possible_fits = possible_fits[:20]
     for fit in possible_fits:
       fit.fitness = self.compute_median_fitness(fit.grid)
 
-    self.best_fit = possible_fits[0]
+    self.best_fit = self.original_choice
     for possible_fit in possible_fits:
-      if possible_fit.fitness > self.best_fit.fitness:
+      if (
+        possible_fit.fitness > self.best_fit.fitness
+        and possible_fit.hole_count <= self.best_fit.hole_count
+      ):
         self.best_fit = possible_fit
     
     if self.best_fit != self.original_choice:
       print('different choice')
-      self.original_choice.grid.draw()
-      SDL_UpdateWindowSurface(self.original_choice.grid.window)
-      time.sleep(2)
     else:
       print('same choice')
-  
+    
   def compute_median_fitness(self, grid):
     possible_fits = []
   
@@ -242,4 +245,4 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):
   return median_score
 
 if __name__ == '__main__':
-  simulate_game(1)
+  simulate_game(100)

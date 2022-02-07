@@ -8,8 +8,7 @@ class Collision(Exception):
   pass
 
 class Grid:
-  def __init__(self, window_surface, width, height, cell_size, window):
-    self.window = window
+  def __init__(self, window_surface, width, height, cell_size):
     self.window_surface = window_surface
     self.w = width
     self.h = height
@@ -28,7 +27,7 @@ class Grid:
     self.cells.append([Color.GRAY for _ in range(self.w)])
   
   def copy(self):
-    grid_copy = Grid(self.window_surface, self.w, self.h, self.cell_size, self.window)
+    grid_copy = Grid(self.window_surface, self.w, self.h, self.cell_size)
     grid_copy.cells = [row.copy() for row in self.cells]
     try:
       grid_copy.piece = Piece(
@@ -207,35 +206,25 @@ class Grid:
     total_depth = 0
 
     for x in range(1, self.w - 1):
-      in_well = False
-      for y in range(1, self.h - 1):
-        if in_well:
-          if (
-            self.cells[y][x] == Color.BLACK
-            and self.cells[y][x-1] != Color.BLACK
-            and self.cells[y][x+1] != Color.BLACK
-          ):
-            depth += 1
-            print(depth)
-          else:
-            if depth >= 3:
-              total_depth += depth
-            
-            break
-
-        elif (
+      y = 1
+      while y < self.h - 1:
+        if (
           self.cells[y][x] == Color.BLACK
           and self.cells[y][x-1] != Color.BLACK
           and self.cells[y][x+1] != Color.BLACK
         ):
-          in_well = True
           depth = 1
-          print('in_well')
+          y += 1
 
-        elif self.cells[y][x] != Color.BLACK:
+          while self.cells[y][x] == Color.BLACK:
+            depth += 1
+            y += 1
+
+          if depth >= 3:
+            total_depth += depth
+          
           break
-      
-      if in_well and depth >= 3:
-        total_depth += depth
+        
+        y += 1
 
     return total_depth

@@ -65,7 +65,7 @@ class TetrisBRKGA(BRKGA):
     self.fitness_simulation_count = fitness_simulation_count
   
   def evolve(self):
-    with Pool(processes=2) as pool:
+    with Pool(processes=3) as pool:
       results = []
       for individual in self.population:
         _, a, b, c, d, e = individual
@@ -88,7 +88,7 @@ class TetrisBRKGA(BRKGA):
 if __name__ == '__main__':
   Path('./tmp').mkdir(exist_ok=True)
   brkga = TetrisBRKGA(16)
-  for generation in range(100):  
+  for generation in range(1000):  
     brkga.evolve()
 
     best_individual = brkga.population[0]
