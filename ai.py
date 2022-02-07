@@ -35,7 +35,7 @@ class AI:
   
   def run(self):
     # possible positions with their fitnesses
-    possible_fits = []
+    best_fitness = -10000000000.0
     for rot in self.grid.piece.unique_rotations:
   
       original_rot = self.grid.piece.rot
@@ -60,70 +60,13 @@ class AI:
           fitness = self.compute_fitness(working_grid, filled_rows)
         else:
           fitness = -10000000000.0
-
-        possible_fit = PossibleFit(fitness, x, rot, working_grid)
-        possible_fits.append(possible_fit)
-
-      self.grid.piece.rot = original_rot
-    
-    possible_fits.sort(reverse=True)
-    self.original_choice = possible_fits[0]
-
-    possible_fits = possible_fits[:20]
-    for fit in possible_fits:
-      fit.fitness = self.compute_median_fitness(fit.grid)
-
-    self.best_fit = self.original_choice
-    for possible_fit in possible_fits:
-      if (
-        possible_fit.fitness > self.best_fit.fitness
-        and possible_fit.hole_count <= self.best_fit.hole_count
-      ):
-        self.best_fit = possible_fit
-    
-    if self.best_fit != self.original_choice:
-      print('different choice')
-    else:
-      print('same choice')
-    
-  def compute_median_fitness(self, grid):
-    possible_fits = []
-  
-    for piece in pieces:
-      grid = grid.copy()
-      grid.add_piece(piece, 4, 1)
-      for rot in grid.piece.unique_rotations:
-        grid.piece.rot = rot
-        min_x, max_x = self.find_min_max_x(grid)
-        for x in range(min_x, max_x + 1):
-          working_grid = grid.copy()
-
-          working_grid.piece_pos = [x, 1]
-          game_over = False
-          try:
-            while True:
-              working_grid.move_piece(0, 1)
-          except Collision:
-            try:
-              working_grid.move_piece(0, -1)
-            except Collision:
-              game_over = True
         
-          if not game_over:
-            filled_rows = working_grid.integrate_piece()
-            fitness = self.compute_fitness(working_grid, filled_rows)
-          else:
-            fitness = -10000000000.0
+        if fitness > best_fitness:
+          best_fitness = fitness
+          self.best_fit = PossibleFit(fitness, x, rot, working_grid)
 
-          possible_fit = PossibleFit(fitness, x, rot, working_grid)
-          possible_fits.append(possible_fit)
-    
-    possible_fits.sort()
-    return (
-      possible_fits[(len(possible_fits) - 1) // 2].fitness
-      + possible_fits[len(possible_fits) // 2].fitness
-    ) / 2
-  
+      self.grid.piece.rot = original_rot    
+ 
   def compute_fitness(self, grid, filled_rows):
     fitness = (
       filled_rows * self.a
