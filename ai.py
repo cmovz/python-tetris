@@ -137,7 +137,7 @@ def simulate_game(count, a=A, b=B, c=C, d=D, e=E, print_stats=True, stop=False):
   scores = []
   for _ in range(count):
     score = 0
-    grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE, None)
+    grid = Grid(None, MAP_SIZE[0], MAP_SIZE[1], CELL_SIZE)
     grid.add_piece(random.choice(pieces), 4, 1)
     bot = VirtualBot(grid, a, b, c, d)
     bot.run()
