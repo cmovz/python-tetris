@@ -100,6 +100,8 @@ class Grid:
     del self.piece
     del self.piece_pos
 
+    self.compute_stats()
+
     return cleared_rows
 
   def is_there_collision(self):
@@ -149,82 +151,30 @@ class Grid:
           ctypes.byref(dest_rect)
         )
   
-  def compute_height(self):
+  def compute_stats(self):
+    heights = [20] + [0 for _ in range(10)] + [20]
+    
+    self.holes = 0
+    self.aggregate_height = 0
+    self.bumpiness = 0
+    self.wells_depth = 0
+
     for y in range(1, self.h - 1):
-      for x in range(1, self.w -1):
+      for x in range(1, 11):
         if self.cells[y][x] != Color.BLACK:
-          return self.h - y - 1
+          if heights[x] == 0:
+            h = self.h - 1 - y
+            heights[x] = h
+            self.aggregate_height += h
+
+        elif heights[x] != 0:
+          self.holes += 1
     
-    return 0
-  
-  def compute_aggregate_height(self):
-    agg_height = 0
-    for x in range(1, self.w - 1):
-      for y in range(1, self.h - 1):
-        if self.cells[y][x] != Color.BLACK:
-          agg_height += self.h - y - 1
+    for x in range(2, 11):
+      self.bumpiness += abs(heights[x] - heights[x - 1])
     
-    return agg_height
-  
-  def compute_bumpiness(self):
-    heights = []
-    for x in range(1, self.w - 1):
-      for y in range(1, self.h - 1):
-        if self.cells[y][x] != Color.BLACK:
-          heights.append(self.h - y - 1)
-          break
-    
-    bumpiness = 0
-    for i in range(1, len(heights)):
-      bumpiness += abs(heights[i-1] - heights[i])
-    
-    return bumpiness
-  
-  def compute_holes(self):
-    visited = set()
-    total = 0
-
-    for y in range(self.h - 1, 2, -1):
-      row = self.cells[y]
-      for x in range(1, self.w - 1):
-        if row[x] == Color.BLACK:
-          hole_size = 1
-          for y1 in range(y - 1, 1, -1):
-            if (x, y1) in visited:
-              break
-
-            visited.add((x, y1))
-            if self.cells[y1][x] == Color.BLACK:
-              hole_size += 1
-            else:
-              total += hole_size
-              break
-    
-    return total
-
-  def compute_wells_depth(self):
-    total_depth = 0
-
-    for x in range(1, self.w - 1):
-      y = 1
-      while y < self.h - 1:
-        if (
-          self.cells[y][x] == Color.BLACK
-          and self.cells[y][x-1] != Color.BLACK
-          and self.cells[y][x+1] != Color.BLACK
-        ):
-          depth = 1
-          y += 1
-
-          while self.cells[y][x] == Color.BLACK:
-            depth += 1
-            y += 1
-
-          if depth >= 3:
-            total_depth += depth
-          
-          break
-        
-        y += 1
-
-    return total_depth
+    for x in range(1, 11):
+      minh = min(heights[x - 1], heights[x + 1])
+      dh = minh - heights[x]
+      if dh >= 3:
+        self.wells_depth += dh

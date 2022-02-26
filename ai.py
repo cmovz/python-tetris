@@ -1,6 +1,5 @@
 import ctypes
 import random
-import time
 from sdl2 import *
 from grid import Grid, Collision
 from pieces import pieces
@@ -19,7 +18,7 @@ class PossibleFit:
     self.x = x
     self.rot = rot
     self.grid = grid
-    self.hole_count = grid.compute_holes()
+    self.hole_count = grid.holes
 
   def __lt__(self, other):
     return self.fitness < other.fitness
@@ -70,15 +69,12 @@ class AI:
   def compute_fitness(self, grid, filled_rows):
     fitness = (
       filled_rows * self.a
-      - grid.compute_bumpiness() * self.b
-      - grid.compute_aggregate_height() * self.c
-      - grid.compute_holes() * self.d
-      - grid.compute_wells_depth() * self.e
+      - grid.bumpiness * self.b
+      - grid.aggregate_height * self.c
+      - grid.holes * self.d
+      - grid.wells_depth * self.e
     )
 
-    if grid.compute_height() >= grid.h - 4:
-      fitness -= 100
-    
     return fitness
 
   @staticmethod
