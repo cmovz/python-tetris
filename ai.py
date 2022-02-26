@@ -4,7 +4,6 @@ from sdl2 import *
 from grid import Grid, Collision
 from pieces import pieces
 from settings import *
-from multiprocessing import Pool
 
 A = 0.11146253876595202
 B = 0.12392743901965475
