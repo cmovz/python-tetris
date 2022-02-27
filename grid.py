@@ -152,7 +152,7 @@ class Grid:
         )
   
   def compute_stats(self):
-    heights = [20] + [0 for _ in range(10)] + [20]
+    heights = [self.h - 2] + [0 for _ in range(10)] + [self.h - 2]
     
     self.holes = 0
     self.aggregate_height = 0
