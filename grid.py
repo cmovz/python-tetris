@@ -152,7 +152,7 @@ class Grid:
         )
   
   def compute_stats(self):
-    heights = [self.h - 2] + [0 for _ in range(10)] + [self.h - 2]
+    heights = [self.h - 2] + [0 for _ in range(self.w - 2)] + [self.h - 2]
     
     self.holes = 0
     self.aggregate_height = 0
@@ -160,7 +160,7 @@ class Grid:
     self.wells_depth = 0
 
     for y in range(1, self.h - 1):
-      for x in range(1, 11):
+      for x in range(1, self.w - 1):
         if self.cells[y][x] != Color.BLACK:
           if heights[x] == 0:
             h = self.h - 1 - y
@@ -170,10 +170,10 @@ class Grid:
         elif heights[x] != 0:
           self.holes += 1
     
-    for x in range(2, 11):
+    for x in range(2, self.w - 1):
       self.bumpiness += abs(heights[x] - heights[x - 1])
     
-    for x in range(1, 11):
+    for x in range(1, self.w - 1):
       minh = min(heights[x - 1], heights[x + 1])
       dh = minh - heights[x]
       if dh >= 3:
