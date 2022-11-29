@@ -5,7 +5,7 @@ class Clock:
     self.update_time()
   
   def update_time(self):
-    self.time = time.clock_gettime_ns(time.CLOCK_MONOTONIC_RAW)
+    self.time = time.monotonic_ns()
 
 class GameClock:
   def __init__(self, clock, ticks_per_second):
