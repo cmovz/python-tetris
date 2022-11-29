@@ -5,11 +5,11 @@ from grid import Grid, Collision
 from pieces import pieces
 from settings import *
 
-A = 0.11146253876595202
-B = 0.12392743901965475
-C = 0.029653844701920895
-D = 0.9624658982587024
-E = 0.32341412515044743
+A = 0.103831
+B = 0.164168
+C = 0.012872
+D = 0.962466
+E = 0.206230
 
 class PossibleFit:
   def __init__(self, fitness, x, rot, grid):
